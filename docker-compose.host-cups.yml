@@ -2,18 +2,34 @@
 #
 #   docker compose -f docker-compose.yml -f docker-compose.host-cups.yml up --build -d service daemon
 #
-# Works with Docker Desktop and plain Docker Engine (host-gateway mapping).
-# The host CUPS must accept requests addressed to "host.docker.internal":
-#   /etc/cups/cupsd.conf:  ServerAlias *
-#   and listen beyond loopback when using plain Docker Engine (e.g. Port 631).
-# Requires Docker Compose >= 2.24 (!override).
+# Why the socat sidecar: requests that reach CUPS via the loopback interface are only
+# accepted with "Host: localhost" (ServerAlias does not apply to loopback clients).
+# Docker Desktop forwards host.docker.internal to the host's loopback, so the daemon
+# shares the network namespace of a small forwarder and talks to "localhost:631".
+# The forwarder relays to the host CUPS. As CUPS then sees a local client, the
+# printers do not need to be shared.
+#
+# Requires Docker Compose >= 2.24 (!reset / !override).
 
 services:
+  cups-proxy:
+    image: alpine/socat:latest
+    restart: unless-stopped
+    command: TCP-LISTEN:631,fork,reuseaddr TCP:host.docker.internal:631
+    # plain Docker Engine (no Docker Desktop): uncomment, and let the host CUPS
+    # listen on the docker bridge (e.g. "Port 631" plus "Allow 172.16.0.0/12")
+    # extra_hosts:
+    #   - "host.docker.internal:host-gateway"
+    ports:
+      # the daemon lives in this container's network namespace, so its port is published here
+      - "8081:8081"
+
   daemon:
+    network_mode: "service:cups-proxy"
+    ports: !reset []
     depends_on: !override
       - service
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+      - cups-proxy
     environment:
-      CUPS_HOST: host.docker.internal
+      CUPS_HOST: localhost
       CUPS_PORT: 631
