@@ -1,0 +1,9 @@
+**/target
+**/node
+**/node_modules
+**/package-lock.json
+**/webpack.generated.js
+.git
+.idea
+output
+.env

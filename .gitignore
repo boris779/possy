@@ -34,3 +34,7 @@ node_modules
 ### Configs ###
 application-prod.yml
 application-dev.yml
+
+### Docker ###
+output/
+.env
