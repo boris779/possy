@@ -34,12 +34,6 @@
 		</sonar.coverage.exclusions>
 	</properties>
 
-	<repositories>
-		<repository>
-			<id>jitpack.io</id>
-			<url>https://jitpack.io</url>
-		</repository>
-	</repositories>
 
 	<dependencies>
 		<!-- Kotlin/Language Basics -->

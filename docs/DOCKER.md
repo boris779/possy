@@ -44,3 +44,17 @@ Printer definitions are kept in the `cups-config` volume.
   the Epson driver is pinned to a commit and built with `-fgnu89-inline`
   (current GCC otherwise fails with `undefined reference to initializeSettings`).
 - Configuration through environment variables / `.env` instead of editing `application.yml`.
+- `pdfbox2-layout` 1.0.0 is vendored as module `pdfbox2-layout/` (MIT, Ralf Stuckert):
+  jitpack.io can no longer build the original Gradle 2.3 project, so the daemon
+  dependency could not be resolved anymore. The jitpack repository was removed.
+
+## Building locally (without Docker)
+
+Use **JDK 11** for Maven (in IntelliJ: *Settings → Build Tools → Maven → Runner → JRE*).
+Kotlin 1.3.61 / kapt does not work on JDK 16 or newer.
+
+```
+./mvnw -U clean package -DskipTests
+```
+
+`-U` is needed once if your local repository still has the failed jitpack lookup cached.
