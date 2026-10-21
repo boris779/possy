@@ -16,6 +16,7 @@ services:
     ports:
       - "8080:8080"
     environment:
+      TZ: ${TZ:-Europe/Vienna}
       POSSY_ADMIN_USERNAME: ${POSSY_ADMIN_USER:-admin}
       POSSY_ADMIN_PASSWORD: ${POSSY_ADMIN_PASSWORD:-admin}
       POSSY_ENCRYPTIONKEY: ${POSSY_ENCRYPTION_KEY:-change-me-to-a-long-random-value}
@@ -45,6 +46,7 @@ services:
     ports:
       - "8081:8081"
     environment:
+      TZ: ${TZ:-Europe/Vienna}
       POSSY_SERVICE_URL: http://service:8080
       POSSY_SERVICE_USERNAME: ${POSSY_API_USER:-possy}
       POSSY_SERVICE_PASSWORD: ${POSSY_API_PASSWORD:-possy}
@@ -64,8 +66,9 @@ services:
     image: possy-cups:local
     restart: unless-stopped
     ports:
-      - "631:631"
+      - "6310:631"
     environment:
+      TZ: ${TZ:-Europe/Vienna}
       CUPS_USER_ADMIN: ${CUPS_ADMIN_USER:-admin}
       CUPS_USER_PASSWORD: ${CUPS_ADMIN_PASSWORD:-admin}
     volumes:

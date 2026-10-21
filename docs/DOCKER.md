@@ -44,3 +44,35 @@ Printer definitions are kept in the `cups-config` volume.
   the Epson driver is pinned to a commit and built with `-fgnu89-inline`
   (current GCC otherwise fails with `undefined reference to initializeSettings`).
 - Configuration through environment variables / `.env` instead of editing `application.yml`.
+- `pdfbox2-layout` 1.0.0 is vendored as module `pdfbox2-layout/` (MIT, Ralf Stuckert):
+  jitpack.io can no longer build the original Gradle 2.3 project, so the daemon
+  dependency could not be resolved anymore. The jitpack repository was removed.
+
+## Building locally (without Docker)
+
+Use **JDK 11** for Maven (in IntelliJ: *Settings → Build Tools → Maven → Runner → JRE*).
+Kotlin 1.3.61 / kapt does not work on JDK 16 or newer.
+
+```
+./mvnw -U clean package -DskipTests
+```
+
+`-U` is needed once if your local repository still has the failed jitpack lookup cached.
+
+## Using the CUPS server of the host
+
+If the printers are already set up in the host's CUPS, skip the cups container:
+
+```
+docker compose -f docker-compose.yml -f docker-compose.host-cups.yml up --build -d service daemon
+```
+
+The daemon reaches the host via `host.docker.internal`. The host CUPS must accept that
+host name: add `ServerAlias *` to `/etc/cups/cupsd.conf` and restart CUPS
+(`sudo systemctl restart cups`). With plain Docker Engine (not Docker Desktop), CUPS must
+also listen on the Docker bridge, e.g. `Port 631` instead of `Listen localhost:631`,
+and allow that network (`Allow 172.16.0.0/12` in `<Location />`).
+
+## Time zone
+
+All containers use `TZ` from `.env` (default `Europe/Vienna`).
