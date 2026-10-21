@@ -16,20 +16,14 @@
  */
 package net.g24.possy.daemon
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.KotlinModule
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 import org.springframework.scheduling.annotation.EnableScheduling
 
 @SpringBootApplication
 @EnableScheduling
-class PossyDaemonApplication(objectMapper: ObjectMapper) {
-
-    init {
-        objectMapper.registerModule(KotlinModule())
-    }
-}
+// jackson-module-kotlin is registered by Spring Boot automatically (module discovery)
+class PossyDaemonApplication
 
 fun main(args: Array<String>) {
     runApplication<PossyDaemonApplication>(*args)

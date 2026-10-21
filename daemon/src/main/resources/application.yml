@@ -12,7 +12,7 @@ possy:
     username: possy
     password: possy
   pdf-generator:
-    redirect_to_file: true
+    redirect-to-file: true
     fonts:
       header:
         font: classpath:SourceSansPro-Black.ttf

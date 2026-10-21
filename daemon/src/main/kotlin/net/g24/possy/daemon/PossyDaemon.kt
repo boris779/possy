@@ -17,7 +17,7 @@
 package net.g24.possy.daemon
 
 import net.g24.possy.daemon.configuration.PossyProperties
-import org.springframework.boot.web.client.RestTemplateBuilder
+import org.springframework.boot.restclient.RestTemplateBuilder
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestTemplate
@@ -31,7 +31,7 @@ class PossyDaemon(possyProperties: PossyProperties, private val possyService: Po
     }
 
     private val restTemplate: RestTemplate = restTemplateBuilder
-            .rootUri(possyProperties.service.url)
+            .baseUri(possyProperties.service.url!!)
             .basicAuthentication(possyProperties.service.username, possyProperties.service.password)
             .build()
 
