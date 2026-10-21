@@ -50,13 +50,17 @@ Printer definitions are kept in the `cups-config` volume.
 
 ## Building locally (without Docker)
 
-Use **JDK 11** for Maven (in IntelliJ: *Settings → Build Tools → Maven → Runner → JRE*).
-Kotlin 1.3.61 / kapt does not work on JDK 16 or newer.
+The modules are being upgraded one by one:
+
+| Module  | Stack                                   | JDK for Maven |
+|---------|-----------------------------------------|---------------|
+| daemon  | Spring Boot 4.1, Kotlin 2.3, Java 21    | 21 or newer   |
+| service | Spring Boot 2.2, Kotlin 1.3, Vaadin 14  | **11** (Kotlin 1.3 / kapt fail on JDK 16+) |
 
 ```
-./mvnw -U clean package -DskipTests
+./mvnw -pl daemon clean verify                 # JDK 21+
+./mvnw -pl service clean package -DskipTests   # JDK 11
 ```
-
 
 ## Using the CUPS server of the host
 

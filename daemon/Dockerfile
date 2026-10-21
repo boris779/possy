@@ -1,9 +1,9 @@
-# possy-daemon — builds inside the container (JDK 11, Maven 3.8)
+# possy-daemon — builds inside the container (JDK 21, Maven 3.9)
 #
 # Build context: repository root, e.g.  docker build -f daemon/Dockerfile .
 
 # ---------- build ----------
-FROM maven:3.8.8-eclipse-temurin-11 AS build
+FROM maven:3.9-eclipse-temurin-21 AS build
 WORKDIR /src
 
 COPY pom.xml .
@@ -20,7 +20,7 @@ RUN --mount=type=cache,target=/root/.m2 \
  && cp daemon/target/daemon-*.jar /app.jar
 
 # ---------- runtime ----------
-FROM eclipse-temurin:11-jre
+FROM eclipse-temurin:21-jre
 
 ENV LANG=C.UTF-8 \
     JAVA_OPTS=""
