@@ -9,16 +9,14 @@ WORKDIR /src
 COPY pom.xml .
 COPY service/pom.xml service/
 COPY epson-tm-t20-cups-docker/pom.xml epson-tm-t20-cups-docker/
-COPY pdfbox2-layout/pom.xml pdfbox2-layout/
 COPY daemon/pom.xml daemon/
 
-COPY pdfbox2-layout/ pdfbox2-layout/
 COPY daemon/ daemon/
 # git-commit-id-plugin generates git.properties (used for the version shown in the UI)
 COPY .git/ .git/
 
 RUN --mount=type=cache,target=/root/.m2 \
-    mvn -B -ntp -pl daemon -am -DskipTests package \
+    mvn -B -ntp -pl daemon -DskipTests package \
  && cp daemon/target/daemon-*.jar /app.jar
 
 # ---------- runtime ----------

@@ -21,8 +21,6 @@ import net.g24.possy.daemon.PrintRequest
 import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.pdmodel.PDPageContentStream
 import org.apache.pdfbox.pdmodel.font.PDFont
-import rst.pdfbox.layout.shape.RoundRect
-import rst.pdfbox.layout.text.Position
 
 abstract class TemplateRenderer : LayoutRenderer {
 
@@ -98,7 +96,7 @@ abstract class TemplateRenderer : LayoutRenderer {
         val h = footerFont.lineHeight.toFloat()
         val x = renderContext.width - 2 * renderContext.marginBorder - w
         val y = 2 * renderContext.marginBorder
-        RoundRect(hBorder).add(doc, contents, Position(x, y + h), w, h)
+        contents.addRoundRect(x, y, w, h, hBorder)
         contents.fill()
 
         contents.setNonStrokingColor(255, 255, 255)

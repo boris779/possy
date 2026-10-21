@@ -16,7 +16,6 @@
   	</scm>
 
 	<modules>
-		<module>pdfbox2-layout</module>
 		<module>daemon</module>
 		<module>service</module>
 		<module>epson-tm-t20-cups-docker</module>
