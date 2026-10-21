@@ -1,0 +1,11 @@
+# Daemon nutzt das CUPS des Hosts statt des CUPS-Containers
+services:
+  daemon:
+    network_mode: host
+    ports: !reset []
+    depends_on: !override
+      - service
+    environment:
+      POSSY_SERVICE_URL: http://localhost:8080
+      CUPS_HOST: localhost
+      CUPS_PORT: 631

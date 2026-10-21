@@ -64,7 +64,7 @@ services:
     image: possy-cups:local
     restart: unless-stopped
     ports:
-      - "631:631"
+      - "6310:631"
     environment:
       CUPS_USER_ADMIN: ${CUPS_ADMIN_USER:-admin}
       CUPS_USER_PASSWORD: ${CUPS_ADMIN_PASSWORD:-admin}
