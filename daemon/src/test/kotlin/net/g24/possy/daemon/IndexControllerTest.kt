@@ -49,6 +49,6 @@ class IndexControllerTest {
 
         mockMvc.perform(get("/"))
                 .andExpect(status().isOk)
-                .andExpect(content().string(containsString(gitProperties.get("commit.id.describe"))))
+                .andExpect(content().string(containsString("1.0.0")))
     }
 }

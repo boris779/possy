@@ -35,9 +35,10 @@ class IndexController(private val gitProperties: GitProperties) {
     private fun versionInfo(): String {
         val combinedVersion = gitProperties.get("commit.id.describe")
         val buildTime = gitProperties.getInstant("build.time")
-                .atZone(ZoneId.systemDefault())
-                .toOffsetDateTime()
-                .format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
+                ?.atZone(ZoneId.systemDefault())
+                ?.toOffsetDateTime()
+                ?.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
+                ?: "unknown build time"
 
         return "$combinedVersion, $buildTime"
     }

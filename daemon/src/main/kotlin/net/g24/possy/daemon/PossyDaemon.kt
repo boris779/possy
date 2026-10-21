@@ -31,8 +31,10 @@ class PossyDaemon(possyProperties: PossyProperties, private val possyService: Po
     }
 
     private val restTemplate: RestTemplate = restTemplateBuilder
-            .baseUri(possyProperties.service.url!!)
-            .basicAuthentication(possyProperties.service.username, possyProperties.service.password)
+            .baseUri(requireNotNull(possyProperties.service.url) { "possy.service.url is not configured" })
+            .basicAuthentication(
+                    requireNotNull(possyProperties.service.username) { "possy.service.username is not configured" },
+                    requireNotNull(possyProperties.service.password) { "possy.service.password is not configured" })
             .build()
 
     @Scheduled(fixedDelay = 10000)
