@@ -53,6 +53,8 @@ services:
       POSSY_PDFGENERATOR_REDIRECTTOFILE: ${POSSY_REDIRECT_TO_FILE:-true}
       CUPS_HOST: cups
       CUPS_PORT: 631
+      # send the note size as CUPS media with each job (see .env.example)
+      CUPS_SENDPAGESIZE: ${CUPS_SEND_PAGE_SIZE:-false}
       # CUPS printer names (as configured in the CUPS web UI)
       CUPS_PRINTERS_WHITE: ${CUPS_PRINTER_WHITE:-possyWhite}
       CUPS_PRINTERS_PINK: ${CUPS_PRINTER_PINK:-possyPink}

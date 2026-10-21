@@ -80,13 +80,16 @@ class PossyService(
             Files.write(Files.createTempFile("possy", ".pdf").toAbsolutePath(), out)
         } else {
             val cupsPrinter = findCupsPrinter(printRequest.template)
-            val pj = PrintJob.Builder(out)
+            val builder = PrintJob.Builder(out)
                     .jobName("Possy #" + ++jobId)
                     .attributes(attribs)
                     .userName("anonymous")
                     .copies(1)
-                    .build()
-            cupsPrinter.print(pj)
+            if (cupsProperties.sendPageSize) {
+                pdfGenerator.printedPageSizeMm(printRequest.template)
+                        ?.let { (width, height) -> builder.pageFormat(customMedia(width, height)) }
+            }
+            cupsPrinter.print(builder.build())
         }
     }
 

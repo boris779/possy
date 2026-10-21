@@ -20,7 +20,9 @@ import net.g24.possy.daemon.configuration.PossyProperties
 import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.text.PDFTextStripper
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
 import org.springframework.core.io.DefaultResourceLoader
@@ -114,6 +116,24 @@ class PdfGeneratorCharacterizationTest {
         assertTrue(text.contains(CONTENT), "content missing in: $text")
         assertTrue(text.contains(TAG), "tag missing in: $text")
         assertEquals(template in WITH_WEIGHT, text.contains(WEIGHT), "weight shown only for $WITH_WEIGHT, text: $text")
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = PrintTemplate::class, names = ["STORY", "TASK", "FREEFORM", "BUG"])
+    fun `printed page size used for the CUPS media matches the PDF page`(template: PrintTemplate) {
+        val (widthMm, heightMm) = pdfGenerator.printedPageSizeMm(template)!!
+        PDDocument.load(render(template)).use { doc ->
+            assertEquals(widthMm * POINTS_PER_MM, doc.getPage(0).mediaBox.width, TOLERANCE)
+            assertEquals(heightMm * POINTS_PER_MM, doc.getPage(0).mediaBox.height, TOLERANCE)
+        }
+    }
+
+    @Test
+    fun `custom media names`() {
+        assertEquals("Custom.72x80mm", customMedia(72f, 80f))
+        assertEquals("Custom.64x160mm", customMedia(64f, 160f))
+        assertEquals("Custom.72.5x80mm", customMedia(72.5f, 80f))
+        assertNull(pdfGenerator.printedPageSizeMm(PrintTemplate.IMAGE))
     }
 
     @ParameterizedTest

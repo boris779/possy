@@ -26,6 +26,12 @@ import org.springframework.validation.annotation.Validated
 class CupsProperties(
         var host: String? = null,
         var port: Int = 0,
+        /**
+         * Send the note's page size with each job (IPP media "Custom.WxHmm"). Avoids blank paper
+         * when the driver's default media is longer than the note (e.g. RP80x200). Off by default:
+         * not every driver/filter chain handles custom sizes (tested ok with RP80 ESC/POS drivers).
+         */
+        var sendPageSize: Boolean = false,
         val printers: Printers = Printers()) {
 
     class Printers(

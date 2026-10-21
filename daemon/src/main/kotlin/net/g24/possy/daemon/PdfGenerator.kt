@@ -30,6 +30,26 @@ import java.io.ByteArrayOutputStream
 @Component
 class PdfGenerator(private val possyProperties: PossyProperties, private val resourceLoader: ResourceLoader) {
 
+    /**
+     * Size of the printed page in mm as (width, height), always portrait (see generatePdf),
+     * or null for templates without a page (IMAGE).
+     */
+    fun printedPageSizeMm(template: PrintTemplate): Pair<Float, Float>? {
+        val spec = pageSpecFor(template) ?: return null
+        return minOf(spec.width, spec.height) to maxOf(spec.width, spec.height)
+    }
+
+    private fun pageSpecFor(template: PrintTemplate): PossyProperties.PdfGenerator.Pages.PageSpec? =
+            with(possyProperties.pdfGenerator.pages) {
+                when (template) {
+                    PrintTemplate.STORY -> story
+                    PrintTemplate.TASK -> task
+                    PrintTemplate.FREEFORM -> freeform
+                    PrintTemplate.BUG -> bug
+                    PrintTemplate.IMAGE -> null
+                }
+            }
+
     fun createPdf(printRequest: PrintRequest): ByteArray {
         ByteArrayOutputStream().use { stream ->
             when (printRequest.template) {
