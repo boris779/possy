@@ -102,9 +102,11 @@ class PdfGeneratorCharacterizationTest {
     @EnumSource(value = PrintTemplate::class, names = ["STORY", "TASK", "FREEFORM", "BUG"])
     fun `page shows key, content and tag`(template: PrintTemplate) {
         // sortByPosition: on the rotated story page the unsorted extraction splits words into single letters
+        // hyphen normalization: the fonts use one glyph for '-' and U+2010/U+2011; depending on
+        // the PDFBox version the embedded ToUnicode map points to a different one of them
         val text = PDDocument.load(render(template)).use { doc ->
             PDFTextStripper().apply { sortByPosition = true }.getText(doc)
-        }
+        }.replace('‐', '-').replace('‑', '-')
 
         assertTrue(text.contains(KEY), "key missing in: $text")
         assertTrue(text.contains(CONTENT), "content missing in: $text")
