@@ -21,6 +21,8 @@ import net.g24.possy.daemon.configuration.PossyProperties
 import org.cups4j.CupsClient
 import org.cups4j.CupsPrinter
 import org.cups4j.PrintJob
+import org.springframework.boot.context.event.ApplicationReadyEvent
+import org.springframework.context.event.EventListener
 import org.springframework.stereotype.Component
 import java.nio.file.Files
 import java.util.*
@@ -34,8 +36,26 @@ class PossyService(
     private var jobId = 0
     private val client: CupsClient = CupsClient(cupsProperties.host!!, cupsProperties.port)
 
-    init {
-        listAllPrinters(client)
+    /**
+     * Logs the CUPS printers once the application is up. Not done in the constructor any more:
+     * an unreachable CUPS server must not prevent the daemon from starting
+     * (e.g. with redirect-to-file, where CUPS is not needed at all).
+     */
+    @EventListener(ApplicationReadyEvent::class)
+    fun logPrinters() {
+        try {
+            val printers = client.printers
+            if (printers.isEmpty()) {
+                logger().warn("CUPS at {}:{} reports no printers (not shared, or request rejected?)",
+                        cupsProperties.host, cupsProperties.port)
+            }
+            printers.forEach { logPrinter(it) }
+            configuredPrinterNames()
+                    .filter { name -> printers.none { it.name == name } }
+                    .forEach { logger().warn("Configured printer '{}' not found in CUPS", it) }
+        } catch (e: Exception) {
+            logger().warn("Cannot list printers of CUPS at {}:{}: {}", cupsProperties.host, cupsProperties.port, e.toString())
+        }
     }
 
     fun print(printRequest: PrintRequest) {
@@ -71,8 +91,15 @@ class PossyService(
     }
 
     private fun findCupsPrinter(template: PrintTemplate): CupsPrinter {
-        val printer = printerNameForTemplate(template)
-        return client.printers.first { printer == it.name }
+        val printerName = printerNameForTemplate(template)
+        val printers = client.printers
+        return printers.firstOrNull { printerName == it.name }
+                ?: throw IllegalStateException("CUPS printer '$printerName' for $template not found " +
+                        "at ${cupsProperties.host}:${cupsProperties.port}; available: ${printers.map { it.name }}")
+    }
+
+    private fun configuredPrinterNames(): Set<String> = with(cupsProperties.printers) {
+        setOfNotNull(white, pink, yellow)
     }
 
     private fun printerNameForTemplate(template: PrintTemplate): String = when (template.paper) {
@@ -81,18 +108,16 @@ class PossyService(
         PrintPaper.YELLOW -> cupsProperties.printers.yellow!!
     }
 
-    private fun listAllPrinters(client: CupsClient) {
-        client.printers.forEach { printer ->
-            logger().info("Printer: {}", printer)
+    private fun logPrinter(printer: CupsPrinter) {
+        logger().info("Printer: {}", printer)
 
-            logger().debug(" Media supported:")
-            printer.mediaSupported.forEach { logger().debug("  - $it") }
+        logger().debug(" Media supported:")
+        printer.mediaSupported.forEach { logger().debug("  - $it") }
 
-            logger().debug(" Resolution supported:")
-            printer.resolutionSupported.forEach { logger().debug("  - $it") }
+        logger().debug(" Resolution supported:")
+        printer.resolutionSupported.forEach { logger().debug("  - $it") }
 
-            logger().debug(" Mime-Types supported:")
-            printer.mimeTypesSupported.forEach { logger().debug("  - $it") }
-        }
+        logger().debug(" Mime-Types supported:")
+        printer.mimeTypesSupported.forEach { logger().debug("  - $it") }
     }
 }
