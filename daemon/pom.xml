@@ -18,8 +18,9 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-		<java.version>21</java.version>
-		<!-- kotlin.version is managed by the Spring Boot parent (2.3.x) -->
+		<java.version>25</java.version>
+		<jackson-bom.version>3.1.8</jackson-bom.version>
+		<tomcat.version>11.0.27</tomcat.version>
 		<cups4j.version>0.8.3</cups4j.version>
 		<pdfbox.version>2.0.37</pdfbox.version>
 		<mockk.version>1.14.11</mockk.version>
