@@ -85,16 +85,18 @@ class PdfGeneratorCharacterizationTest {
 
     @ParameterizedTest
     @EnumSource(value = PrintTemplate::class, names = ["STORY", "TASK", "FREEFORM", "BUG"])
-    fun `page has the configured size and orientation`(template: PrintTemplate) {
+    fun `page is portrait with the configured size`(template: PrintTemplate) {
         PDDocument.load(render(template)).use { doc ->
             assertEquals(1, doc.numberOfPages)
 
+            // landscape notes (story) are printed as a portrait page with turned content,
+            // so they come out of the 80 mm roll printer lengthwise with any CUPS driver
             val page = doc.getPage(0)
             val (widthMm, heightMm) = PAGE_SIZES_MM.getValue(template)
-            assertEquals(widthMm * POINTS_PER_MM, page.mediaBox.width, TOLERANCE)
-            assertEquals(heightMm * POINTS_PER_MM, page.mediaBox.height, TOLERANCE)
-            // landscape notes are rotated so they come out of the 80 mm printer correctly
-            assertEquals(if (widthMm > heightMm) 90 else 0, page.rotation)
+            assertEquals(minOf(widthMm, heightMm) * POINTS_PER_MM, page.mediaBox.width, TOLERANCE)
+            assertEquals(maxOf(widthMm, heightMm) * POINTS_PER_MM, page.mediaBox.height, TOLERANCE)
+            // no /Rotate flag: some CUPS drivers ignore it and print only a strip of the note
+            assertEquals(0, page.rotation)
         }
     }
 

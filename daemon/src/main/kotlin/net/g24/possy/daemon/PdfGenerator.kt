@@ -22,6 +22,7 @@ import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.pdmodel.PDPage
 import org.apache.pdfbox.pdmodel.PDPageContentStream
 import org.apache.pdfbox.pdmodel.common.PDRectangle
+import org.apache.pdfbox.util.Matrix
 import org.springframework.core.io.ResourceLoader
 import org.springframework.stereotype.Component
 import java.io.ByteArrayOutputStream
@@ -53,13 +54,24 @@ class PdfGenerator(private val possyProperties: PossyProperties, private val res
                     FontContext(resourceLoader, possyProperties.pdfGenerator.fonts.header),
                     FontContext(resourceLoader, possyProperties.pdfGenerator.fonts.content),
                     FontContext(resourceLoader, possyProperties.pdfGenerator.fonts.footer))
+            val landscape = renderContext.width > renderContext.height
             val page = PDPage()
-            page.mediaBox = PDRectangle(renderContext.width, renderContext.height)
-            if (renderContext.width > renderContext.height) {
-                page.rotation = 90
-            }
             doc.addPage(page)
-            PDPageContentStream(doc, page).use { contents -> layoutRenderer.render(printRequest, doc, contents, renderContext) }
+            if (landscape) {
+                // Landscape notes (story) are emitted as a portrait page with the content turned
+                // by 90° clockwise. The former /Rotate 90 page flag was ignored by some CUPS
+                // drivers, which then printed only a narrow strip of the note on the 80 mm roll.
+                page.mediaBox = PDRectangle(renderContext.height, renderContext.width)
+            } else {
+                page.mediaBox = PDRectangle(renderContext.width, renderContext.height)
+            }
+            PDPageContentStream(doc, page).use { contents ->
+                if (landscape) {
+                    // maps landscape (x, y) to portrait (y, width - x) – same result as /Rotate 90
+                    contents.transform(Matrix(0f, -1f, 1f, 0f, 0f, renderContext.width))
+                }
+                layoutRenderer.render(printRequest, doc, contents, renderContext)
+            }
             doc.save(stream)
         }
     }
