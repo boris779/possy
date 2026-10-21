@@ -14,6 +14,8 @@ COPY daemon/pom.xml daemon/
 
 COPY pdfbox2-layout/ pdfbox2-layout/
 COPY daemon/ daemon/
+# git-commit-id-plugin generates git.properties (used for the version shown in the UI)
+COPY .git/ .git/
 
 RUN --mount=type=cache,target=/root/.m2 \
     mvn -B -ntp -pl daemon -am -DskipTests package \

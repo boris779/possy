@@ -16,6 +16,8 @@ COPY pdfbox2-layout/pom.xml pdfbox2-layout/
 COPY service/pom.xml service/
 
 COPY service/ service/
+# git-commit-id-plugin generates git.properties (used for the version shown in the UI)
+COPY .git/ .git/
 
 # Kotlin 1.3 / kapt only works on JDK <= 15 -> JDK 11 here is intentional.
 RUN --mount=type=cache,target=/root/.m2 \
