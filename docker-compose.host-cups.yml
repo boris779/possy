@@ -1,11 +1,19 @@
-# Daemon nutzt das CUPS des Hosts statt des CUPS-Containers
+# Use the CUPS server of the Docker host instead of the cups container.
+#
+#   docker compose -f docker-compose.yml -f docker-compose.host-cups.yml up --build -d service daemon
+#
+# Works with Docker Desktop and plain Docker Engine (host-gateway mapping).
+# The host CUPS must accept requests addressed to "host.docker.internal":
+#   /etc/cups/cupsd.conf:  ServerAlias *
+#   and listen beyond loopback when using plain Docker Engine (e.g. Port 631).
+# Requires Docker Compose >= 2.24 (!override).
+
 services:
   daemon:
-    network_mode: host
-    ports: !reset []
     depends_on: !override
       - service
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     environment:
-      POSSY_SERVICE_URL: http://localhost:8080
-      CUPS_HOST: localhost
+      CUPS_HOST: host.docker.internal
       CUPS_PORT: 631

@@ -23,7 +23,7 @@ RUN git clone https://github.com/nemik/epson-tm-t20-cups.git . \
 FROM debian:bookworm-slim
 
 RUN apt-get update \
-  && apt-get install -y --no-install-recommends cups cups-client cups-bsd cups-filters libcupsimage2 \
+  && apt-get install -y --no-install-recommends cups cups-client cups-bsd cups-filters libcupsimage2 tzdata \
   && rm -rf /var/lib/apt/lists/*
 
 COPY --from=driver /build/rastertozj /usr/lib/cups/filter/rastertozj

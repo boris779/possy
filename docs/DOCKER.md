@@ -58,3 +58,21 @@ Kotlin 1.3.61 / kapt does not work on JDK 16 or newer.
 ```
 
 `-U` is needed once if your local repository still has the failed jitpack lookup cached.
+
+## Using the CUPS server of the host
+
+If the printers are already set up in the host's CUPS, skip the cups container:
+
+```
+docker compose -f docker-compose.yml -f docker-compose.host-cups.yml up --build -d service daemon
+```
+
+The daemon reaches the host via `host.docker.internal`. The host CUPS must accept that
+host name: add `ServerAlias *` to `/etc/cups/cupsd.conf` and restart CUPS
+(`sudo systemctl restart cups`). With plain Docker Engine (not Docker Desktop), CUPS must
+also listen on the Docker bridge, e.g. `Port 631` instead of `Listen localhost:631`,
+and allow that network (`Allow 172.16.0.0/12` in `<Location />`).
+
+## Time zone
+
+All containers use `TZ` from `.env` (default `Europe/Vienna`).
