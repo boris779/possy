@@ -1,0 +1,78 @@
+# possy — complete stack:  docker compose up --build
+#
+#   possy-service  http://localhost:8080   (UI login: POSSY_ADMIN_USER / POSSY_ADMIN_PASSWORD)
+#   CUPS           http://localhost:631    (admin: CUPS_ADMIN_USER / CUPS_ADMIN_PASSWORD)
+#
+# Values come from .env (see .env.example). Without a printer, keep
+# POSSY_REDIRECT_TO_FILE=true – the daemon then writes PDFs to ./output.
+
+services:
+  service:
+    build:
+      context: .
+      dockerfile: service/Dockerfile
+    image: possy-service:local
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      TZ: ${TZ:-Europe/Vienna}
+      POSSY_ADMIN_USERNAME: ${POSSY_ADMIN_USER:-admin}
+      POSSY_ADMIN_PASSWORD: ${POSSY_ADMIN_PASSWORD:-admin}
+      POSSY_ENCRYPTIONKEY: ${POSSY_ENCRYPTION_KEY:-change-me-to-a-long-random-value}
+      # technical user the daemon uses for /api/print
+      SPRING_SECURITY_USER_NAME: ${POSSY_API_USER:-possy}
+      SPRING_SECURITY_USER_PASSWORD: ${POSSY_API_PASSWORD:-possy}
+      JIRA_URL: ${JIRA_URL:-https://jira.changeme.at/}
+      JIRA_USERNAME: ${JIRA_USERNAME:-changeme}
+      JIRA_PASSWORD: ${JIRA_PASSWORD:-changeme}
+    # optional: full config override (Jira field mappings etc.)
+    # volumes:
+    #   - ./config/service/application.yml:/config/application.yml:ro
+    # environment:
+    #   SPRING_CONFIG_ADDITIONAL_LOCATION: /config/
+
+  daemon:
+    build:
+      context: .
+      dockerfile: daemon/Dockerfile
+    image: possy-daemon:local
+    restart: unless-stopped
+    depends_on:
+      service:
+        condition: service_started
+      cups:
+        condition: service_healthy
+    ports:
+      - "8081:8081"
+    environment:
+      TZ: ${TZ:-Europe/Vienna}
+      POSSY_SERVICE_URL: http://service:8080
+      POSSY_SERVICE_USERNAME: ${POSSY_API_USER:-possy}
+      POSSY_SERVICE_PASSWORD: ${POSSY_API_PASSWORD:-possy}
+      POSSY_PDFGENERATOR_REDIRECTTOFILE: ${POSSY_REDIRECT_TO_FILE:-true}
+      CUPS_HOST: cups
+      CUPS_PORT: 631
+      # CUPS printer names (as configured in the CUPS web UI)
+      CUPS_PRINTERS_WHITE: ${CUPS_PRINTER_WHITE:-possyWhite}
+      CUPS_PRINTERS_PINK: ${CUPS_PRINTER_PINK:-possyPink}
+      CUPS_PRINTERS_YELLOW: ${CUPS_PRINTER_YELLOW:-possyYellow}
+    volumes:
+      - ./output:/output
+
+  cups:
+    build:
+      context: epson-tm-t20-cups-docker
+    image: possy-cups:local
+    restart: unless-stopped
+    ports:
+      - "6310:631"
+    environment:
+      TZ: ${TZ:-Europe/Vienna}
+      CUPS_USER_ADMIN: ${CUPS_ADMIN_USER:-admin}
+      CUPS_USER_PASSWORD: ${CUPS_ADMIN_PASSWORD:-admin}
+    volumes:
+      - cups-config:/etc/cups
+
+volumes:
+  cups-config:
