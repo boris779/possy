@@ -30,10 +30,10 @@ import kotlin.random.Random
 @ExtendWith(SpringExtension::class)
 class PdfGeneratorTest {
 
-    @MockkBean
+    @MockkBean(relaxUnitFun = true) // Spring calls @EventListener methods (e.g. logPrinters) on the mocks
     private lateinit var possyService: PossyService
 
-    @MockkBean
+    @MockkBean(relaxUnitFun = true) // Spring calls @EventListener methods (e.g. logPrinters) on the mocks
     private lateinit var possyDaemon: PossyDaemon
 
     @Autowired
