@@ -20,6 +20,7 @@ import net.g24.possy.daemon.LayoutRenderer
 import net.g24.possy.daemon.PrintRequest
 import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.pdmodel.PDPageContentStream
+import java.awt.Color
 import org.apache.pdfbox.pdmodel.font.PDFont
 
 abstract class TemplateRenderer : LayoutRenderer {
@@ -60,7 +61,7 @@ abstract class TemplateRenderer : LayoutRenderer {
 
         val textWidth = getTextWidth(text, font, fontSize.toFloat())
 
-        contents.setStrokingColor(100, 100, 100)
+        contents.setStrokingColor(Color(100, 100, 100))
         contents.setLineWidth(0.5f)
         val hBorder = 3.0f
         val vBorder = (headerFont.lineHeight - headerFont.size) / 2.0f
@@ -72,7 +73,7 @@ abstract class TemplateRenderer : LayoutRenderer {
         contents.addRect(x, y, w, h)
         contents.stroke()
 
-        contents.setNonStrokingColor(0, 0, 0)
+        contents.setNonStrokingColor(Color(0, 0, 0))
         showTextAt(contents, text, Cursor(x + hBorder, y + vBorder + baseline), font, fontSize.toFloat())
     }
 
@@ -88,7 +89,7 @@ abstract class TemplateRenderer : LayoutRenderer {
 
         val textWidth = getTextWidth(text, font, fontSize.toFloat())
 
-        contents.setNonStrokingColor(100, 100, 100)
+        contents.setNonStrokingColor(Color(100, 100, 100))
         val hBorder = 6.0f
         val vBorder = (footerFont.lineHeight - footerFont.size) / 2.0f
         val baseline = fontSize / 6.0f // how to calc baseline?
@@ -99,21 +100,21 @@ abstract class TemplateRenderer : LayoutRenderer {
         contents.addRoundRect(x, y, w, h, hBorder)
         contents.fill()
 
-        contents.setNonStrokingColor(255, 255, 255)
+        contents.setNonStrokingColor(Color(255, 255, 255))
         showTextAt(contents, text, Cursor(x + hBorder, y + vBorder + baseline), font, fontSize.toFloat())
-        contents.setNonStrokingColor(0, 0, 0)
+        contents.setNonStrokingColor(Color(0, 0, 0))
 
     }
 
     protected fun drawLightRect(contents: PDPageContentStream, width: Float, height: Float, marginBorder: Float) {
-        contents.setStrokingColor(100, 100, 100)
+        contents.setStrokingColor(Color(100, 100, 100))
         contents.setLineWidth(0.5f)
         contents.addRect(marginBorder, marginBorder, width - 2 * marginBorder, height - 2 * marginBorder)
         contents.stroke()
     }
 
     protected fun drawBoldRect(contents: PDPageContentStream, width: Float, height: Float, marginBorder: Float) {
-        contents.setStrokingColor(0, 0, 0)
+        contents.setStrokingColor(Color(0, 0, 0))
         contents.setLineWidth(2f)
         contents.addRect(marginBorder, marginBorder, width - 2 * marginBorder, height - 2 * marginBorder)
         contents.stroke()

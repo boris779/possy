@@ -19,6 +19,7 @@ package net.g24.possy.daemon.templaterenderer
 import net.g24.possy.daemon.PrintRequest
 import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.pdmodel.PDPageContentStream
+import java.awt.Color
 
 class StoryTemplateRenderer : TemplateRenderer() {
 
@@ -41,8 +42,8 @@ class StoryTemplateRenderer : TemplateRenderer() {
 
         val headerFont = renderContext.headerFont
 
-        contents.setNonStrokingColor(200, 200, 200)
+        contents.setNonStrokingColor(Color(200, 200, 200))
         showTextAt(contents, text, Cursor(renderContext.marginBorder, renderContext.marginBorder), headerFont.applyFont(doc), renderContext.height / 1.5f)
-        contents.setNonStrokingColor(0, 0, 0)
+        contents.setNonStrokingColor(Color(0, 0, 0))
     }
 }

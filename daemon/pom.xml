@@ -22,7 +22,7 @@
 		<jackson-bom.version>3.1.8</jackson-bom.version>
 		<tomcat.version>11.0.27</tomcat.version>
 		<cups4j.version>0.8.3</cups4j.version>
-		<pdfbox.version>2.0.37</pdfbox.version>
+		<pdfbox.version>3.0.8</pdfbox.version>
 		<mockk.version>1.14.11</mockk.version>
 		<springmockk.version>5.0.1</springmockk.version>
 		<jacoco.version>0.8.15</jacoco.version>

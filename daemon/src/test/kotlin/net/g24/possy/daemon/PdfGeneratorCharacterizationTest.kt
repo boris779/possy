@@ -17,7 +17,7 @@
 package net.g24.possy.daemon
 
 import net.g24.possy.daemon.configuration.PossyProperties
-import org.apache.pdfbox.pdmodel.PDDocument
+import org.apache.pdfbox.Loader
 import org.apache.pdfbox.text.PDFTextStripper
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
@@ -88,7 +88,7 @@ class PdfGeneratorCharacterizationTest {
     @ParameterizedTest
     @EnumSource(value = PrintTemplate::class, names = ["STORY", "TASK", "FREEFORM", "BUG"])
     fun `page is portrait with the configured size`(template: PrintTemplate) {
-        PDDocument.load(render(template)).use { doc ->
+        Loader.loadPDF(render(template)).use { doc ->
             assertEquals(1, doc.numberOfPages)
 
             // landscape notes (story) are printed as a portrait page with turned content,
@@ -108,7 +108,7 @@ class PdfGeneratorCharacterizationTest {
         // sortByPosition: on the rotated story page the unsorted extraction splits words into single letters
         // hyphen normalization: the fonts use one glyph for '-' and U+2010/U+2011; depending on
         // the PDFBox version the embedded ToUnicode map points to a different one of them
-        val text = PDDocument.load(render(template)).use { doc ->
+        val text = Loader.loadPDF(render(template)).use { doc ->
             PDFTextStripper().apply { sortByPosition = true }.getText(doc)
         }.replace('‐', '-').replace('‑', '-')
 
@@ -122,7 +122,7 @@ class PdfGeneratorCharacterizationTest {
     @EnumSource(value = PrintTemplate::class, names = ["STORY", "TASK", "FREEFORM", "BUG"])
     fun `printed page size used for the CUPS media matches the PDF page`(template: PrintTemplate) {
         val (widthMm, heightMm) = pdfGenerator.printedPageSizeMm(template)!!
-        PDDocument.load(render(template)).use { doc ->
+        Loader.loadPDF(render(template)).use { doc ->
             assertEquals(widthMm * POINTS_PER_MM, doc.getPage(0).mediaBox.width, TOLERANCE)
             assertEquals(heightMm * POINTS_PER_MM, doc.getPage(0).mediaBox.height, TOLERANCE)
         }

@@ -54,11 +54,11 @@ The modules are being upgraded one by one:
 
 | Module  | Stack                                   | JDK for Maven |
 |---------|-----------------------------------------|---------------|
-| daemon  | Spring Boot 4.1, Kotlin 2.3, Java 21    | 21 or newer   |
+| daemon  | Spring Boot 4.1, Kotlin 2.3, Java 25    | 25 or newer   |
 | service | Spring Boot 2.2, Kotlin 1.3, Vaadin 14  | **11** (Kotlin 1.3 / kapt fail on JDK 16+) |
 
 ```
-./mvnw -pl daemon clean verify                 # JDK 21+
+./mvnw -pl daemon clean verify                 # JDK 25+
 ./mvnw -pl service clean package -DskipTests   # JDK 11
 ```
 
